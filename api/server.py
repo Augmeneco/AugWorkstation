@@ -1,28 +1,49 @@
 #!/usr/bin/python3
-import os, threading, subprocess, shlex, time, socket, traceback, json, sys, signal
+import os, threading, subprocess, shlex, time, socket, traceback, json, sys, signal, hashlib
 
 AUGWORK_DIR = '/home/cha14ka/Desktop/cha14ka/prog/AugWorkstation'
+SHA256_SALT = 'augworksalt'
 active_users = {}
 ports = []
+
+if not os.path.exists('users_data.json'):
+    os.system('echo {} > users_data.json')
+
+users_data = json.loads(open('users_data.json','r').read())
 
 def generate_port():
     for port in range(5901,5999):
         if port not in ports:
             ports.append(port)
             return port
-    print({"error":"no ports available"})
+    print('Нет свободных портов')
     exit()
 
 def start_docker(user):
     if not os.path.isdir(AUGWORK_DIR+'/home/'+user['name']):
         os.system(AUGWORK_DIR+'/api/install_home.sh '+user['name']+' '+user['password'])
 
-    #subprocess.getoutput('''xrandr | grep \* | awk '{print $1}' ''').split('\n')
     user['process'] = subprocess.Popen(
         ['./start_docker.sh',user['name'],str(user['port']),user['resolution']],
         preexec_fn=os.setsid
     )
 
+if sys.argv[1] == 'useradd':
+    login = sys.argv[2]
+    password = sys.argv[3]
+    if login in users_data:
+        print('Этот пользователь уже существует. Вы можете сменить пароль ему командой changepass')
+        exit()
+        
+    users_data[login] = {
+        'password':hashlib.sha256((password+SHA256_SALT).encode()).hexdigest()
+    }
+    open('users_data.json','w').write(json.dumps(users_data))
+    print('Пользователь '+login+' был успешно добавлен')
+    exit()
+    
+    
+    
 conn = None
 while True:
     try:
