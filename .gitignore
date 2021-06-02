@@ -3,3 +3,5 @@
 **/lib
 **/*.lps
 **/augworkstation-client
+**/augwork-server
+**/users_data.json
