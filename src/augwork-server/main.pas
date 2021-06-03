@@ -3,7 +3,7 @@ unit main;
 interface
 
 uses
-  Classes, sysutils, blcksock, fgl, Process, jsonparser, fpjson;
+  Classes, sysutils, blcksock, fgl, Process, jsonparser, fpjson, BaseUnix, md5;
 
 type TIntegerList = specialize TFPGList<Integer>;
 
@@ -31,11 +31,25 @@ type TUsersThreads = specialize TFPGMap<String, TUserInfo>;
 
 function GeneratePort: Integer;
 
+procedure HandleSigInt(aSignal: LongInt); cdecl;
+
 var
   UsedPorts: TIntegerList;
   UsersThreads: TUsersThreads;
+  UsersConfig, Config: TJSONObject;
+  ListenSocket, ClientSocket: TTCPBlockSocket;
 
 implementation
+
+procedure HandleSigInt(aSignal: LongInt); cdecl;
+begin
+  WriteLn('Handle SigInt');
+  ListenSocket.CloseSocket;
+  ClientSocket.CloseSocket;
+  Halt(1);
+  //FreeAndNil(ListenSocket);
+  //ClientSocket.Free;}
+end;
 
 function GeneratePort: Integer;
 var
@@ -78,7 +92,7 @@ begin
   begin
     if Terminated then
     begin
-      AProcess.Terminate(0);
+      RunCommand('/usr/bin/pkill',['-P',IntToStr(AProcess.ProcessID)],LStdOut);
       Exit;
     end;
     Sleep(250);
@@ -88,18 +102,69 @@ end;
 
 var
   User: TUserInfo;
-  ListenSocket, ClientSocket: TTCPBlockSocket;
-  Data: String;
+  Data, Salt, Login, Password: String;
   Query, Response: TJSONObject;
+  I: Integer;
+  FileReader: TStringList;
 
+initialization
 begin
+try
+  FpSignal(SigInt, @HandleSigInt);
+
+  FileReader := TStringList.Create;
   UsedPorts := TIntegerList.Create;
   UsersThreads := TUsersThreads.Create;
   ClientSocket := TTCPBlockSocket.Create;
 
+  if not FileExists('config.json') then
+  begin
+    WriteLn('Config file dont exists');
+    Exit;
+  end;
+
+  FileReader.LoadFromFile('config.json');
+  Config := TJSONObject(GetJSON(FileReader.Text));
+  Salt := Config.Strings['salt'];
+
+  if not FileExists('users_data.json') then
+  begin
+    FileReader.Text := '{}';
+    FileReader.SaveToFile('users_data.json');
+  end;
+  FileReader.LoadFromFile('users_data.json');
+  UsersConfig := TJSONObject(GetJSON(FileReader.Text));
+
+  if ParamStr(1) = 'useradd' then
+  begin
+    if ParamCount <> 3 then
+    begin
+      WriteLn('Wrong arguments');
+      Exit;
+    end;
+
+    Login := ParamStr(2);
+    Password := ParamStr(3);
+
+    if UsersConfig.IndexOfName(Login) <> -1 then
+    begin
+      WriteLn('This user already exists');
+      Exit;
+    end;
+
+    UsersConfig.Add(Login, TJSONObject.Create);
+    UsersConfig.Objects[Login].Add(
+      'password', MD5Print(MD5String(Password+Salt))
+    );
+    FileReader.Text := UsersConfig.FormatJSON;
+    FileReader.SaveToFile('users_data.json');
+    WriteLn('User ',Login,' was added');
+    Exit;
+  end;
+
   ListenSocket := TTCPBlockSocket.Create;
   ListenSocket.CreateSocket;
-  ListenSocket.Bind('0.0.0.0','5900');
+  ListenSocket.Bind('0.0.0.0',Config.Strings['port']);
   if ListenSocket.LastError <> 0 then
   begin
     WriteLn('Error binding port');
@@ -124,12 +189,29 @@ begin
         end;
         Query := TJSONObject(GetJSON(Data));
         WriteLn(Query.FormatJSON());
+
+        if Query.Strings['method'] = 'killall' then
+        begin
+          for I:=0 to UsersThreads.Count-1 do
+          begin
+            WriteLn('Killing '+UsersThreads.Data[i].Login);
+            UsersThreads.Data[i].Thread.Terminate;
+          end;
+        end;
+
         if Query.Strings['method'] = 'login' then
         begin
-          if True then
+          if UsersConfig.IndexOfName(Query.Strings['login']) = -1 then
+          begin
+            ClientSocket.SendString('{"error":"this user dont exists"}'+CRLF);
+            ClientSocket.CloseSocket;
+          end else
+          if UsersConfig.Objects[Query.Strings['login']].Strings['password'] =
+             MD5Print(MD5String(Query.Strings['password']+Salt)) then
           begin
             if UsersThreads.IndexOf(Query.Strings['login']) <> -1 then
             begin
+              WriteLn('Killing exists session');
               User := UsersThreads.KeyData[Query.Strings['login']];
               User.Thread.Terminate;
               UsedPorts.Remove(User.Port);
@@ -148,18 +230,39 @@ begin
             UsersThreads.Add(User.Login, User);
 
             Response := TJSONObject.Create;
-            Response.Add('host', 'cha14ka.tk');
+            Response.Add('host', Config.Strings['host']);
             Response.Add('port', User.Port);
             Response.Add('password', User.Password);
 
             ClientSocket.SendString(Response.AsJSON+CRLF);
             ClientSocket.CloseSocket;
+          end
+          else
+          begin
+            WriteLn('Wrong password on user "',Query.Strings['login'],
+                    '" from IP: ',ClientSocket.GetRemoteSinIP);
+            ClientSocket.SendString('{"error":"wrong password"}'+CRLF);
+            ClientSocket.CloseSocket;
           end;
         end;
 
+        ClientSocket.CloseSocket;
       end;
     end;
   end;
+finally
+  try
+    WriteLn(CRLF,'Closing port');
+    ClientSocket.CloseSocket;
+    ClientSocket.Free;
+    ListenSocket.CloseSocket;
+    ListenSocket.Free;
+  except
+    on E: Exception do Write('Error: '+ E.ClassName + #13#10 + E.Message);
+  end;
+end;
+end;
+
 end.
 
 
