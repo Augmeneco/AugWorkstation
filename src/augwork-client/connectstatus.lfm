@@ -1,0 +1,41 @@
+object Frame4: TFrame4
+  Left = 0
+  Height = 222
+  Top = 0
+  Width = 593
+  ClientHeight = 222
+  ClientWidth = 593
+  DesignTimePPI = 91
+  ParentFont = False
+  TabOrder = 0
+  DesignLeft = 317
+  DesignTop = 26
+  object Panel1: TPanel
+    Left = 96
+    Height = 136
+    Top = 40
+    Width = 408
+    Anchors = []
+    BevelInner = bvLowered
+    ClientHeight = 136
+    ClientWidth = 408
+    Color = 16250871
+    ParentColor = False
+    TabOrder = 0
+    object Label3: TLabel
+      Left = 2
+      Height = 132
+      Top = 2
+      Width = 404
+      Align = alClient
+      Alignment = taCenter
+      AutoSize = False
+      Caption = 'Connecting...'
+      Font.Height = -25
+      Font.Name = 'Sans'
+      Layout = tlCenter
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+end

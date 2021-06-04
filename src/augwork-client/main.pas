@@ -6,7 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
-  blcksock, connectframe, jsonparser, fpjson, process, addsession, optionsframe;
+  Menus, blcksock, connectframe, jsonparser, fpjson, process, addsession,
+  optionsframe;
 
 type
 
@@ -17,16 +18,22 @@ type
     Button2: TButton;
     Button3: TButton;
     Button4: TButton;
-    Button5: TButton;
+    Label1: TLabel;
     ListBox1: TListBox;
     Panel1: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Frame1_1: TFrame;
     Panel4: TPanel;
+    Splitter1: TSplitter;
+    procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure ListBox1Click(Sender: TObject);
+    procedure UpdateSessions;
   private
 
   public
@@ -34,7 +41,7 @@ type
   end;
 
 const
-  VERSION = '0.5';
+  VERSION = '0.6';
 
 var
   Form1: TForm1;
@@ -50,39 +57,52 @@ var
 
 { TForm1 }
 
-{procedure TForm1.Button1Click(Sender: TObject);
+procedure TForm1.UpdateSessions;
 var
-  Login, Password, STDOUT: String;
-  Response: TJSONObject;
+  JsonEnum: TJSONEnum;
 begin
-  Login := Edit1.Text;
-  Password := Edit2.Text;
-  TCPClient.Connect('cha14ka.tk','5900');
-  TCPClient.SendString(
-    Format(
-      '{"method":"login","login":"%s","password":"%s","resolution":"%dx%d"}'#13#10,
-      [Login, Password, Screen.Width,Screen.Height]
-    )
-  );
-  Response := TJSONObject(GetJSON(TCPClient.RecvString(16000)));
-  TCPClient.CloseSocket;
-
-  RunCommand('x11vnc -storepasswd '+Password+' /tmp/.vnc_pass',STDOUT);
-  Sleep(10000);
-  RunCommand('vncviewer -passwd /tmp/.vnc_pass -Fullscreen '+Response.Strings['host']+':'+Response.Strings['port'],STDOUT);
-
-end;     }
+  ListBox1.Clear;
+  for JsonEnum in Config.Objects['sessions'] do
+  begin
+    ListBox1.Items.Add(JsonEnum.Key);
+  end;
+end;
 
 procedure TForm1.FormShow(Sender: TObject);
+
 begin
   if NeedOptions then
   begin
     Frame1_1 := TFrame3.Create(Panel4);
     Frame1_1.Parent := Panel4;
     Frame1_1.Align := alClient;
+    TFrame3(Frame1_1).Edit1.Text := Config.Strings['host'];
+    TFrame3(Frame1_1).Edit2.Text := Config.Strings['port'];
   end;
 
+  UpdateSessions;
+
   WindowState:=wsFullScreen;
+  Label1.Caption := Label1.Caption + VERSION;
+end;
+
+procedure TForm1.ListBox1Click(Sender: TObject);
+var
+  SessionObject: TJSONObject;
+begin
+  if Assigned(Frame1_1) then
+     FreeAndNil(Frame1_1);
+  Frame1_1 := TFrame1.Create(Panel4);
+  Frame1_1.Parent := Panel4;
+  Frame1_1.Align := alClient;
+
+  if ListBox1.ItemIndex <> -1 then
+  begin
+    SessionObject := Config.Objects['sessions'].Objects[ListBox1.Items[ListBox1.ItemIndex]];
+
+    TFrame1(Frame1_1).Edit1.Text := SessionObject.Strings['login'];
+    TFrame1(Frame1_1).Edit2.Text := SessionObject.Strings['password'];
+  end;
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
@@ -90,10 +110,53 @@ begin
   Halt;
 end;
 
+procedure TForm1.Button5Click(Sender: TObject);
+var
+  SessionObject: TJSONObject;
+begin
+  if Assigned(Frame1_1) then
+     FreeAndNil(Frame1_1);
+  Frame1_1 := TFrame1.Create(Panel4);
+  Frame1_1.Parent := Panel4;
+  Frame1_1.Align := alClient;
+
+  if ListBox1.ItemIndex <> -1 then
+  begin
+    SessionObject := Config.Objects['sessions'].Objects[ListBox1.Items[ListBox1.ItemIndex]];
+
+    TFrame1(Frame1_1).Edit1.Text := SessionObject.Strings['login'];
+    TFrame1(Frame1_1).Edit2.Text := SessionObject.Strings['password'];
+  end;
+end;
+
 procedure TForm1.Button2Click(Sender: TObject);
 begin
-  FreeAndNil(Frame1_1);
+  if Assigned(Frame1_1) then
+     FreeAndNil(Frame1_1);
   Frame1_1 := TFrame3.Create(Panel4);
+  Frame1_1.Parent := Panel4;
+  Frame1_1.Align := alClient;
+  TFrame3(Frame1_1).Edit1.Text := Config.Strings['host'];
+  TFrame3(Frame1_1).Edit2.Text := Config.Strings['port'];
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+begin
+  if Assigned(Frame1_1) then
+     FreeAndNil(Frame1_1);
+  Config.Objects['sessions'].Delete(
+    ListBox1.Items[ListBox1.ItemIndex]
+  );
+  UpdateSessions;
+  FileReader.Text := Config.FormatJSON;
+  FileReader.SaveToFile('config.json');
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+  if Assigned(Frame1_1) then
+     FreeAndNil(Frame1_1);
+  Frame1_1 := TFrame2.Create(Panel4);
   Frame1_1.Parent := Panel4;
   Frame1_1.Align := alClient;
 end;
@@ -108,6 +171,7 @@ begin
     Config := TJSONObject.Create;
     Config.Add('host','');
     Config.Add('port',5900);
+    Config.Add('sessions',TJSONObject.Create);
     FileReader.Text := Config.FormatJSON;
     FileReader.SaveToFile('config.json');
     NeedOptions := True;

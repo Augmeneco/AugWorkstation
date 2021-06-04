@@ -1,4 +1,10 @@
 {
   "host" : "cha14ka.tk",
-  "port" : "5900"
+  "port" : "5900",
+  "sessions" : {
+    "Админ" : {
+      "login" : "admin",
+      "password" : "admin"
+    }
+  }
 }

@@ -9,6 +9,7 @@ object Form1: TForm1
   Color = clWhite
   DesignTimePPI = 91
   OnShow = FormShow
+  LCLVersion = '2.0.12.0'
   object Panel2: TPanel
     Left = 0
     Height = 473
@@ -33,6 +34,7 @@ object Form1: TForm1
         Top = 8
         Width = 66
         Caption = 'Add'
+        OnClick = Button1Click
         TabOrder = 0
       end
       object Button3: TButton
@@ -41,15 +43,8 @@ object Form1: TForm1
         Top = 8
         Width = 64
         Caption = 'Delete'
+        OnClick = Button3Click
         TabOrder = 1
-      end
-      object Button5: TButton
-        Left = 152
-        Height = 28
-        Top = 8
-        Width = 64
-        Caption = 'Connect'
-        TabOrder = 2
       end
     end
     object ListBox1: TListBox
@@ -59,6 +54,7 @@ object Form1: TForm1
       Width = 230
       Align = alClient
       ItemHeight = 0
+      OnClick = ListBox1Click
       ScrollWidth = 226
       TabOrder = 1
       TopIndex = -1
@@ -91,13 +87,34 @@ object Form1: TForm1
       OnClick = Button4Click
       TabOrder = 1
     end
+    object Label1: TLabel
+      Left = 184
+      Height = 28
+      Top = 8
+      Width = 784
+      Alignment = taCenter
+      Anchors = [akTop, akLeft, akRight]
+      AutoSize = False
+      Caption = 'Aug Workstation v'
+      Font.Height = -15
+      Font.Name = 'Sans'
+      Layout = tlCenter
+      ParentColor = False
+      ParentFont = False
+    end
   end
   object Panel4: TPanel
+    Left = 237
+    Height = 473
+    Top = 48
+    Width = 746
+    Align = alClient
+    TabOrder = 2
+  end
+  object Splitter1: TSplitter
     Left = 232
     Height = 473
     Top = 48
-    Width = 751
-    Align = alClient
-    TabOrder = 2
+    Width = 5
   end
 end

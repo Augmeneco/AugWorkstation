@@ -36,7 +36,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="5">
+    <Units Count="6">
       <Unit0>
         <Filename Value="augworkstationlpi.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -59,14 +59,22 @@
         <Filename Value="addsession.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Frame2"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
       </Unit3>
       <Unit4>
         <Filename Value="optionsframe.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Frame3"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
       </Unit4>
+      <Unit5>
+        <Filename Value="connectstatus.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Frame4"/>
+        <ResourceBaseClass Value="Frame"/>
+      </Unit5>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -83,6 +91,10 @@
       <SmartLinkUnit Value="True"/>
     </CodeGeneration>
     <Linking>
+      <Debugging>
+        <GenerateDebugInfo Value="False"/>
+        <StripSymbols Value="True"/>
+      </Debugging>
       <LinkSmart Value="True"/>
       <Options>
         <Win32>

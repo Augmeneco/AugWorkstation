@@ -28,6 +28,7 @@ object Frame1: TFrame1
       Top = 240
       Width = 71
       Caption = 'Connect'
+      OnClick = Button1Click
       TabOrder = 0
     end
     object Edit1: TEdit

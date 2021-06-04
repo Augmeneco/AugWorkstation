@@ -104,16 +104,17 @@ var
   Query, Response: TJSONObject;
   I: Integer;
   FileReader: TStringList;
+  ExistsSession: Boolean;
 
 initialization
 begin
-try
   FpSignal(SigInt, @HandleSigInt);
 
   FileReader := TStringList.Create;
   UsedPorts := TIntegerList.Create;
   UsersThreads := TUsersThreads.Create;
   ClientSocket := TTCPBlockSocket.Create;
+  ExistsSession := False;
 
   if not FileExists('config.json') then
   begin
@@ -174,6 +175,7 @@ try
 
   while True do
   begin
+    try
     if ListenSocket.CanRead(1000) then
     begin
       ClientSocket.Socket := ListenSocket.Accept;
@@ -181,8 +183,10 @@ try
       while True do
       begin
         Data := ClientSocket.RecvString(16000);
+        WriteLn('Client message: ',Data);
         if Data = '' then begin
           Writeln('Client exit');
+          ClientSocket.CloseSocket;
           Break;
         end;
         Query := TJSONObject(GetJSON(Data));
@@ -201,7 +205,8 @@ try
         begin
           if UsersConfig.IndexOfName(Query.Strings['login']) = -1 then
           begin
-            ClientSocket.SendString('{"error":"this user dont exists"}'+CRLF);
+            ClientSocket.SendString('{"error":"This user dont exists"}'+CRLF);
+            Writeln('Client exit');
             ClientSocket.CloseSocket;
           end else
           if UsersConfig.Objects[Query.Strings['login']].Strings['password'] =
@@ -215,6 +220,7 @@ try
               UsedPorts.Remove(User.Port);
               UsersThreads.Remove(User.Login);
               FreeAndNil(User);
+              ExistsSession := True;
             end;
 
             User := TUserInfo.Create;
@@ -231,15 +237,18 @@ try
             Response.Add('host', Config.Strings['host']);
             Response.Add('port', User.Port);
             Response.Add('password', User.Password);
+            Response.Add('exists_session', ExistsSession);
 
             ClientSocket.SendString(Response.AsJSON+CRLF);
+            Writeln('Client exit');
             ClientSocket.CloseSocket;
+            ExistsSession := False;
           end
           else
           begin
             WriteLn('Wrong password on user "',Query.Strings['login'],
                     '" from IP: ',ClientSocket.GetRemoteSinIP);
-            ClientSocket.SendString('{"error":"wrong password"}'+CRLF);
+            ClientSocket.SendString('{"error":"Wrong password"}'+CRLF);
             ClientSocket.CloseSocket;
           end;
         end;
@@ -247,18 +256,16 @@ try
         ClientSocket.CloseSocket;
       end;
     end;
+    except
+      on E: Exception do
+      begin
+        WriteLn('Client exit');
+        WriteLn('Error: '+ E.ClassName + #13#10 + E.Message);
+        ClientSocket.CloseSocket;
+      end;
+    end;
   end;
-finally
-  try
-    WriteLn(CRLF,'Closing port');
-    ClientSocket.CloseSocket;
-    ClientSocket.Free;
-    ListenSocket.CloseSocket;
-    ListenSocket.Free;
-  except
-    on E: Exception do Write('Error: '+ E.ClassName + #13#10 + E.Message);
-  end;
-end;
+
 end;
 
 end.

@@ -30,15 +30,26 @@ type
   end;
 
 implementation
-uses main;
+uses main, jsonparser, fpjson;
 
 {$R *.lfm}
 
 { TFrame2 }
 
 procedure TFrame2.Button1Click(Sender: TObject);
+var
+  SessionObject: TJSONObject;
 begin
-  main.Config.Add('da','pizda');
+  SessionObject := TJSONObject.Create;
+  SessionObject.Add('login', Edit2.Text);
+  SessionObject.Add('password', Edit3.Text);
+
+  main.Config.Objects['sessions'].Add(Edit1.Text, SessionObject);
+  main.Form1.UpdateSessions;
+  main.FileReader.Text := main.Config.FormatJSON;
+  main.FileReader.SaveToFile('config.json');
+
+  FreeAndNil(main.Form1.Frame1_1);
 end;
 
 end.
