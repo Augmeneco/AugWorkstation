@@ -9,85 +9,95 @@ object Form1: TForm1
   Color = clWhite
   DesignTimePPI = 91
   OnShow = FormShow
-  object Panel1: TPanel
-    Left = 232
-    Height = 337
-    Top = 84
-    Width = 529
-    Anchors = []
-    BevelInner = bvLowered
-    ClientHeight = 337
-    ClientWidth = 529
-    Color = 15066597
-    ParentColor = False
+  object Panel2: TPanel
+    Left = 0
+    Height = 473
+    Top = 48
+    Width = 232
+    Align = alLeft
+    ClientHeight = 473
+    ClientWidth = 232
     TabOrder = 0
-    object Label2: TLabel
-      Left = 136
-      Height = 16
-      Top = 104
-      Width = 34
-      Caption = 'Login'
-      ParentColor = False
-    end
-    object Label3: TLabel
-      Left = 136
-      Height = 16
-      Top = 184
-      Width = 58
-      Caption = 'Password'
-      ParentColor = False
-    end
-    object Button1: TButton
-      Left = 232
-      Height = 24
-      Top = 264
-      Width = 71
-      Caption = 'Connect'
-      OnClick = Button1Click
+    object Panel3: TPanel
+      Left = 1
+      Height = 47
+      Top = 1
+      Width = 230
+      Align = alTop
+      ClientHeight = 47
+      ClientWidth = 230
       TabOrder = 0
+      object Button1: TButton
+        Left = 8
+        Height = 28
+        Top = 8
+        Width = 66
+        Caption = 'Add'
+        TabOrder = 0
+      end
+      object Button3: TButton
+        Left = 80
+        Height = 28
+        Top = 8
+        Width = 64
+        Caption = 'Delete'
+        TabOrder = 1
+      end
+      object Button5: TButton
+        Left = 152
+        Height = 28
+        Top = 8
+        Width = 64
+        Caption = 'Connect'
+        TabOrder = 2
+      end
     end
-    object Edit2: TEdit
-      Left = 136
-      Height = 25
-      Top = 208
-      Width = 256
-      EchoMode = emPassword
-      PasswordChar = '*'
+    object ListBox1: TListBox
+      Left = 1
+      Height = 424
+      Top = 48
+      Width = 230
+      Align = alClient
+      ItemHeight = 0
+      ScrollWidth = 226
       TabOrder = 1
-    end
-    object Edit1: TEdit
-      Left = 136
-      Height = 25
-      Top = 128
-      Width = 256
-      TabOrder = 2
-    end
-    object Label1: TLabel
-      Left = 136
-      Height = 28
-      Top = 16
-      Width = 220
-      Caption = 'AugWorkstation v'
-      Font.Height = -25
-      Font.Name = 'Sans'
-      ParentColor = False
-      ParentFont = False
+      TopIndex = -1
     end
   end
-  object Button2: TButton
+  object Panel1: TPanel
     Left = 0
-    Height = 27
-    Top = 494
-    Width = 71
-    Anchors = [akLeft, akBottom]
-    Caption = 'Exit'
-    Color = 5131982
-    Font.Color = clWhite
-    Font.Height = -15
-    Font.Name = 'Sans'
-    Font.Style = [fsBold]
-    OnClick = Button2Click
-    ParentFont = False
+    Height = 48
+    Top = 0
+    Width = 983
+    Align = alTop
+    ClientHeight = 48
+    ClientWidth = 983
     TabOrder = 1
+    object Button2: TButton
+      Left = 96
+      Height = 28
+      Top = 8
+      Width = 80
+      Caption = 'Options'
+      OnClick = Button2Click
+      TabOrder = 0
+    end
+    object Button4: TButton
+      Left = 8
+      Height = 28
+      Top = 8
+      Width = 80
+      Caption = 'Exit'
+      OnClick = Button4Click
+      TabOrder = 1
+    end
+  end
+  object Panel4: TPanel
+    Left = 232
+    Height = 473
+    Top = 48
+    Width = 751
+    Align = alClient
+    TabOrder = 2
   end
 end

@@ -47,8 +47,6 @@ begin
   ListenSocket.CloseSocket;
   ClientSocket.CloseSocket;
   Halt(1);
-  //FreeAndNil(ListenSocket);
-  //ClientSocket.Free;}
 end;
 
 function GeneratePort: Integer;
@@ -264,15 +262,3 @@ end;
 end;
 
 end.
-
-
-
-
-
-
-
-
-
-
-
-

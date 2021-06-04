@@ -1,0 +1,86 @@
+object Frame1: TFrame1
+  Left = 0
+  Height = 372
+  Top = 0
+  Width = 495
+  ClientHeight = 372
+  ClientWidth = 495
+  DesignTimePPI = 91
+  ParentFont = False
+  TabOrder = 0
+  DesignLeft = 324
+  DesignTop = 25
+  object Panel1: TPanel
+    Left = 40
+    Height = 288
+    Top = 40
+    Width = 408
+    Anchors = []
+    BevelInner = bvLowered
+    ClientHeight = 288
+    ClientWidth = 408
+    Color = 16250871
+    ParentColor = False
+    TabOrder = 0
+    object Button1: TButton
+      Left = 168
+      Height = 24
+      Top = 240
+      Width = 71
+      Caption = 'Connect'
+      TabOrder = 0
+    end
+    object Edit1: TEdit
+      Left = 56
+      Height = 25
+      Top = 112
+      Width = 298
+      TabOrder = 1
+    end
+    object Edit2: TEdit
+      Left = 56
+      Height = 25
+      Top = 200
+      Width = 298
+      EchoMode = emPassword
+      PasswordChar = '*'
+      TabOrder = 2
+    end
+    object Label1: TLabel
+      Left = 56
+      Height = 24
+      Top = 168
+      Width = 86
+      AutoSize = False
+      Caption = 'Password'
+      Font.Height = -15
+      Font.Name = 'Sans'
+      ParentColor = False
+      ParentFont = False
+    end
+    object Label2: TLabel
+      Left = 56
+      Height = 24
+      Top = 80
+      Width = 57
+      AutoSize = False
+      Caption = 'Login'
+      Font.Height = -15
+      Font.Name = 'Sans'
+      ParentColor = False
+      ParentFont = False
+    end
+    object Label3: TLabel
+      Left = 128
+      Height = 40
+      Top = 40
+      Width = 172
+      AutoSize = False
+      Caption = 'Log in to the system'
+      Font.Height = -15
+      Font.Name = 'Sans'
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+end
