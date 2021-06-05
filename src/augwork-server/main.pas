@@ -79,8 +79,9 @@ begin
     RunCommand('/bin/bash',
       ['../scripts/install_home.sh',UserInfo.Login,UserInfo.Password],LStdOut);
 
+
   AProcess := TProcess.Create(nil);
-  AProcess.Executable:= '/bin/bash';
+  AProcess.Executable := '/bin/bash';
   AProcess.Parameters.AddStrings(
     ['../scripts/start_docker.sh', UserInfo.Login, IntToStr(UserInfo.Port), UserInfo.Resolution]);
   AProcess.Options := [poUsePipes, poStderrToOutPut];
@@ -142,7 +143,7 @@ begin
       Exit;
     end;
 
-    Login := ParamStr(2);
+    Login := LowerCase(ParamStr(2));
     Password := ParamStr(3);
 
     if UsersConfig.IndexOfName(Login) <> -1 then
@@ -224,7 +225,7 @@ begin
             end;
 
             User := TUserInfo.Create;
-            User.Login := Query.Strings['login'];
+            User.Login := LowerCase(Query.Strings['login']);
             User.Password := Query.Strings['password'];
             User.Resolution := Query.Strings['resolution'];
             User.Port := GeneratePort;

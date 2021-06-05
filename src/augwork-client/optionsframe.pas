@@ -39,6 +39,7 @@ begin
   main.Config.Strings['port'] := Edit2.Text;
   main.FileReader.Text := main.Config.FormatJSON;
   main.FileReader.SaveToFile('config.json');
+  FreeAndNil(main.Form1.Frame1_1);
 end;
 
 end.

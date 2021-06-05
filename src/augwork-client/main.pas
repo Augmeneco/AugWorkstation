@@ -41,7 +41,7 @@ type
   end;
 
 const
-  VERSION = '0.6';
+  VERSION = '0.7';
 
 var
   Form1: TForm1;
@@ -144,6 +144,7 @@ procedure TForm1.Button3Click(Sender: TObject);
 begin
   if Assigned(Frame1_1) then
      FreeAndNil(Frame1_1);
+  if ListBox1.ItemIndex = -1 then Exit;
   Config.Objects['sessions'].Delete(
     ListBox1.Items[ListBox1.ItemIndex]
   );

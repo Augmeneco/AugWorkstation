@@ -82,7 +82,7 @@ begin
       RunCommand('vncviewer -passwd /tmp/.vnc_pass -Fullscreen '+Response.Strings['host']+':'+Response.Strings['port'],STDOUT);
       Break;
     end;
-    Sleep(100);
+    Sleep(200);
   end;
 
 end;

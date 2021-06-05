@@ -3,32 +3,27 @@ FROM archlinux
 RUN echo 'Server = https://mirror.yandex.ru/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
 
 RUN pacman -Syu --noconfirm
-RUN pacman -S --noconfirm xorg-server xfce4 xfce4-goodies
-RUN pacman -S --noconfirm konsole sudo fakeroot binutils neofetch noto-fonts
+RUN pacman -Sy --noconfirm xorg-server xfce4 xfce4-goodies
+RUN pacman -Sy --noconfirm konsole sudo fakeroot binutils neofetch noto-fonts
+RUN pacman -Sy --noconfirm gst-plugins-ugly ttf-dejavu ttf-liberation ttf-carlito
 
-#WPS OFFICE
+#ONLYOFFICE
 RUN pacman -S --noconfirm git && \
     cd /tmp && \
-    git clone https://aur.archlinux.org/wps-office.git && \
-    cd wps-office && \
-    chmod -R 777 /tmp/wps-office && \
+    git clone https://aur.archlinux.org/onlyoffice-bin.git && \
+    cd onlyoffice-bin && \
+    chmod -R 777 /tmp/onlyoffice-bin && \
     sudo -u nobody makepkg -s --noconfirm
-RUN cd /tmp/wps-office && \
+RUN cd /tmp/onlyoffice-bin && \
     pacman -U --noconfirm ./*.pkg.tar.zst
 
-#WPS OFFICE FONTS
-RUN cd /tmp && \
-    git clone https://aur.archlinux.org/ttf-wps-fonts.git && \
-    cd ttf-wps-fonts && \
-    chmod -R 777 /tmp/ttf-wps-fonts && \
-    sudo -u nobody makepkg -s --noconfirm
-RUN cd /tmp/ttf-wps-fonts && \
-    pacman -U --noconfirm ./*.pkg.tar.zst
-
-RUN pacman -S firefox
+RUN pacman -Sy --noconfirm firefox vlc kate gimp thunderbird
 
 ENV LANG ru_RU.UTF-8
-RUN echo en_EN.UTF-8 UTF-8 > /etc/locale.gen
+RUN echo en_US.UTF-8 UTF-8 > /etc/locale.gen
 RUN echo ru_RU.UTF-8 UTF-8 >> /etc/locale.gen
+COPY ru_RU /usr/share/i18n/locales
+RUN locale-gen
+RUN echo "LANG=ru_RU.UTF-8" > /etc/locale.conf
 
 CMD ["startxfce4"]
